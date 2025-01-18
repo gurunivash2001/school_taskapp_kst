@@ -3,8 +3,9 @@ import 'package:get/get.dart';
 import 'package:schooltask/app/core/app_asset.dart';
 import 'package:schooltask/app/core/app_string.dart';
 import 'package:schooltask/app/core/app_style.dart';
+import 'package:schooltask/app/modules/home/home_controller.dart';
 import 'package:schooltask/app/widgets/categorie_containers.dart';
-
+ 
 class HomeScreen extends StatelessWidget {
   final String userName;
 
@@ -12,6 +13,8 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.put(HomeScreenController());
+
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -28,22 +31,33 @@ class HomeScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: Column(
-          children: [
-            _buildProfileSection(),
-            const SizedBox(height: 15),
-            _buildDailyActivitiesSection(),
-            const SizedBox(height: 5),
-            _buildUpcomingEventsSection(),
-          ],
-        ),
-      ),
+      body: Obx(() {
+        if (controller.isLoading.value) {
+          Future.delayed(const Duration(seconds: 0), () {
+            controller.finishLoading();
+          });
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+
+        return Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: Column(
+            children: [
+              _buildProfileSection(userName),
+              const SizedBox(height: 15),
+              _buildDailyActivitiesSection(),
+              const SizedBox(height: 5),
+              _buildUpcomingEventsSection(),
+            ],
+          ),
+        );
+      }),
     );
   }
 
-  Widget _buildProfileSection() {
+  Widget _buildProfileSection(String userName) {
     return Container(
       height: Get.height / 5.5,
       width: double.infinity,
